@@ -1,0 +1,106 @@
+<html>
+
+<head>
+   <title>Plot</title>
+</head>
+
+<body>
+   <canvas id="myCanvas" width="200" height="200" style="border:1px solid #000000;">
+   </canvas> 
+   <p id="start"></p>
+</body>
+<script>
+   //Generate random coordinates in a 200x200 matrix
+   function generateCoordinates() {
+      let x = Math.floor(Math.random() * 200);
+      let y = Math.floor(Math.random() * 200);
+      return [x, y];
+   }
+
+   function calculateDistance(arr1, arr2) {
+      //Calclate distance between two points
+      let x1 = arr1[0];
+      let y1 = arr1[1];
+      let x2 = arr2[0];
+      let y2 = arr2[1];
+      let distance = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+      console.log("Point 1: " + arr1 + " - Point 2: " + arr2 + " - Dist: " + distance)
+      return distance;
+   }
+
+   function nearestNeighbour(point, arr) {
+      //Find position of nearest neighbour
+      console.log("Finding")
+      let minDistance = calculateDistance(point, arr[0]);
+      let nearestNeighbour = 0
+      for (let i = 0; i < arr.length; i++) {
+         console.log(i)
+         let distance = calculateDistance(point, arr[i]);
+         if (distance < minDistance) {
+            minDistance = distance;
+            nearestNeighbour = i;
+         }
+         console.log(i)
+      }
+      console.log("Nearest point", nearestNeighbour)
+      return nearestNeighbour;
+   }
+
+   let shortestPath = [];
+   let currentLocation = generateCoordinates();
+
+   //Generate 7 coordinates
+   let coordinates = [];
+   for (let i = 0; i < 8; i++) {
+      coordinates.push(generateCoordinates());
+   }
+
+   //Reccurive function to find shortest path
+   function main(currentPoint, arr) {
+
+      console.log("==================================")
+      console.log("Current Point: " + currentPoint)
+      console.log("Stack", arr)
+      console.log("Path", shortestPath)
+      console.log("==================================")
+
+      if (arr.length == 1) {
+         shortestPath.push(arr[0])
+         return;
+      } else {
+
+         let position = nearestNeighbour(currentPoint, arr);
+         console.log(position)
+         currentPoint = arr[position]
+         shortestPath.push(currentPoint)
+         arr.splice(position, 1)
+
+         main(currentPoint, arr);
+      }
+   }
+
+   
+   main(currentLocation, coordinates);
+   shortestPath.unshift(currentLocation)
+   console.log("Path", shortestPath)
+
+   function draw(){
+      let w = document.getElementById("start")
+      w.innerHTML=currentLocation;
+      //draw coordinates path into canvas
+      let c = document.getElementById("myCanvas")
+      var ctx = c.getContext("2d");
+      for(let i=0; i<shortestPath.length-1;i++){
+         ctx.moveTo(shortestPath[i][0],shortestPath[i][1]);
+         ctx.lineTo(shortestPath[i+1][0], shortestPath[i+1][1]);
+         ctx.stroke();
+      }
+      ctx.font = "10px Arial";
+      ctx.fillText("start", shortestPath[0][0], shortestPath[0][1]);
+   }
+
+   draw( )
+
+</script>
+
+</html>

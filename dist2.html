@@ -1,0 +1,113 @@
+<html>
+
+<head>
+   <title>Plot</title>
+</head>
+
+<body>
+   Plotting all best case out of all Permutations
+   <canvas id="myCanvas" width="200" height="200" style="border:1px solid #000000;">
+   </canvas> 
+   <p id="start"></p>
+</body>
+<script>
+   const width = 800;
+   const height = 640;
+   document.getElementById("myCanvas").width = width;
+   document.getElementById("myCanvas").height = height;
+
+   function getAllPermutation(arr){
+   //Generate all permutations of a given array without repetiting elements
+   var permArr = [],
+         usedChars = [];
+   function permute(input) {
+      var i, ch;
+      for (i = 0; i < input.length; i++) {
+         ch = input.splice(i, 1)[0];
+         usedChars.push(ch);
+         if (input.length == 0) {
+            permArr.push(usedChars.slice());
+         }
+         permute(input);
+         input.splice(i, 0, ch);
+         usedChars.pop();
+      }
+      return permArr;
+   }
+   return permute(arr);
+}
+
+function generateCoordinates() {
+   let x = Math.floor(Math.random() * 400);
+   let y = Math.floor(Math.random() * 400);
+   return [x, y];
+}
+var count = 0;
+function calculateDistance(point1, point2) {
+   count++;
+   //Calclate distance between two points
+   let x1 = point1[0];
+   let y1 = point1[1];
+   let x2 = point2[0];
+   let y2 = point2[1];
+   let distance = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+   return distance;
+}
+
+function totalDistance(arr){
+   //Calculate total distance of a permutation
+   let total = 0;
+   for (let i = 0; i < arr.length - 1; i++) {
+      total += calculateDistance(arr[i], arr[i + 1]);
+   }
+   return total;
+}
+
+let origin = generateCoordinates();
+let coordinates = [];
+for (let i = 0; i < 6; i++) {
+   coordinates.push(generateCoordinates());
+}
+
+let permutations = getAllPermutation(coordinates);
+
+let firstPerm = [origin,...permutations[0], origin];
+
+let shortestDistance = totalDistance(firstPerm);
+let shortestPath = []
+//loop through all permutations to find the shortest distance
+for (let i = 1; i < permutations.length; i++) {
+   let permutation = [origin,...permutations[i], origin];
+   let total = totalDistance(permutation);
+   console.log(permutation);
+   console.log(total);
+   if (total < shortestDistance) {
+      shortestDistance = total;
+      shortestPath = permutation;
+   }
+}
+
+console.log(shortestPath);
+
+   function draw(){
+      let w = document.getElementById("start")
+      
+      //draw coordinates path into canvas
+      let c = document.getElementById("myCanvas")
+      var ctx = c.getContext("2d");
+      for(let i=0; i<shortestPath.length-1;i++){
+         ctx.moveTo(shortestPath[i][0],shortestPath[i][1]);
+         ctx.lineTo(shortestPath[i+1][0], shortestPath[i+1][1]);
+         ctx.stroke();
+         ctx.font = "8px Arial";
+         ctx.fillText(JSON.stringify(shortestPath[i+1]), shortestPath[i+1][0], shortestPath[i+1][1]);
+      }
+      ctx.font = "12px Arial";
+      ctx.fillText("Origin", shortestPath[0][0], shortestPath[0][1]);
+   }
+
+   draw()
+   console.log(count);
+</script>
+
+</html>
